@@ -13,13 +13,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
         body { background: #f1f5f9; font-family: 'Cairo', sans-serif; }
         .hidden { display: none !important; }
+        .ltr { direction: ltr; text-align: left; }
     </style>
 </head>
 <body>
 
     <div id="login-page" class="min-h-screen flex items-center justify-center p-6">
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-sm border border-slate-100 text-center">
-            <div class="bg-blue-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
+            <div class="bg-blue-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
                 <i class="fas fa-chart-line text-white text-3xl"></i>
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-2">لوحة تحكم المروج</h2>
@@ -30,7 +31,7 @@
         </div>
     </div>
 
-    <div id="dashboard" class="hidden min-h-screen">
+    <div id="dashboard" class="hidden min-h-screen pb-10">
         <div class="bg-white p-5 shadow-sm flex justify-between items-center px-8 border-b border-slate-100">
             <div class="flex items-center gap-3">
                 <div class="bg-blue-600 text-white p-2 rounded-lg text-sm"><i class="fas fa-briefcase"></i></div>
@@ -40,8 +41,23 @@
         </div>
 
         <div class="p-6 max-w-md mx-auto space-y-6">
-            <div class="text-right">
-                <h4 class="text-slate-600 font-bold">أهلاً بك، <span id="user-display-name" class="text-blue-600">...</span></h4>
+            
+            <div class="text-right flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm">
+                <h4 class="text-slate-600 font-bold">أهلاً بك، <span id="user-display-name" class="text-blue-600 underline">...</span></h4>
+                <span class="bg-green-100 text-green-600 text-[10px] px-2 py-1 rounded-full font-bold">حساب نشط</span>
+            </div>
+
+            <div class="bg-slate-800 p-6 rounded-[2rem] shadow-xl text-white">
+                <h4 class="font-bold mb-3 text-sm flex items-center gap-2">
+                    <i class="fas fa-link text-blue-400"></i> رابطك التسويقي الخاص
+                </h4>
+                <p class="text-[10px] text-slate-400 mb-4">انشر هذا الرابط، وكل نقرة ستضاف إلى حسابك تلقائياً.</p>
+                <div class="flex gap-2">
+                    <input type="text" id="referral-link" readonly class="flex-1 bg-slate-700 border-none rounded-xl p-3 text-[10px] text-blue-300 outline-none ltr">
+                    <button onclick="copyLink()" class="bg-white text-slate-800 px-4 rounded-xl hover:bg-blue-100 transition">
+                        <i class="far fa-copy"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
@@ -67,7 +83,7 @@
 
             <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100">
                 <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
-                    <i class="fas fa-money-check-alt text-blue-600"></i> سحب الأرباح
+                    <i class="fas fa-wallet text-blue-600"></i> سحب الأرباح
                 </h4>
                 <div class="space-y-4">
                     <select id="withdraw-method" class="w-full p-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none text-sm font-bold appearance-none">
@@ -102,9 +118,12 @@
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 
-                // استخراج اسم المستخدم من الإيميل (مثلاً zainab@gmail.com يأخذ zainab)
                 const username = user.email.split('@')[0];
                 document.getElementById('user-display-name').innerText = username;
+                
+                // توليد الرابط التسويقي تلقائياً للمروج
+                const myDomain = window.location.origin;
+                document.getElementById('referral-link').value = myDomain + "/go.html?id=" + username;
                 
                 loadData(username);
             } else {
@@ -122,25 +141,27 @@
         document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
         function loadData(username) {
-            // يقرأ البيانات من users_data/[اسم المستخدم]
             db.ref('users_data/' + username).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     document.getElementById('total-earnings').innerText = '$' + (data.earnings || '0.00');
                     document.getElementById('today-earnings').innerText = '$' + (data.today_earnings || '0.00');
                     document.getElementById('clicks').innerText = data.clicks || '0';
-                } else {
-                    // إذا لم تكن هناك بيانات لهذا المستخدم بعد
-                    document.getElementById('total-earnings').innerText = '$0.00';
-                    document.getElementById('clicks').innerText = '0';
                 }
             });
+        }
+
+        function copyLink() {
+            const linkField = document.getElementById('referral-link');
+            linkField.select();
+            document.execCommand('copy');
+            alert("تم نسخ رابطك التسويقي! انشره الآن لبدء جمع النقرات.");
         }
 
         function requestWithdraw() {
             const amount = document.getElementById('withdraw-amount').value;
             if(!amount || amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
-            alert("تم إرسال طلب السحب بنجاح، سيتم التواصل معكِ.");
+            alert("تم إرسال طلب السحب بنجاح، سيتم المراجعة من قبل الإدارة.");
         }
     </script>
 </body>
