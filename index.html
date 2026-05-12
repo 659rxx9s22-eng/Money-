@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -23,7 +23,7 @@
                 <i class="fas fa-chart-line text-white text-3xl"></i>
             </div>
             <h2 class="text-2xl font-black text-slate-800 mb-2">لوحة تحكم المروج</h2>
-            <p class="text-slate-400 mb-8 text-sm">سجلي دخول لمتابعة أرباحج</p>
+            <p class="text-slate-400 mb-8 text-sm">سجل دخول لمتابعة أرباحك</p>
             <input type="email" id="email" placeholder="البريد الإلكتروني" class="w-full p-4 mb-4 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-center">
             <input type="password" id="password" placeholder="كلمة المرور" class="w-full p-4 mb-6 rounded-2xl bg-slate-50 border border-slate-200 outline-none focus:ring-2 focus:ring-blue-500 text-center">
             <button id="loginBtn" class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg hover:bg-blue-700 transition-all">دخول النظام</button>
@@ -113,8 +113,8 @@
         document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
         function loadData() {
-            // القراءة من Zno مباشرة
-            db.ref('users_data/Zno').on('value', (snapshot) => {
+            // القراءة من مسار عام "promoter_data"
+            db.ref('promoter_data').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     document.getElementById('total-earnings').innerText = '$' + (data.earnings || '0.00');
@@ -126,9 +126,3 @@
 
         function requestWithdraw() {
             const amount = document.getElementById('withdraw-amount').value;
-            if(!amount || amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
-            alert("تم إرسال طلب السحب بنجاح، سيتم التواصل معكِ.");
-        }
-    </script>
-</body>
-</html>
