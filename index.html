@@ -40,6 +40,10 @@
         </div>
 
         <div class="p-6 max-w-md mx-auto space-y-6">
+            <div class="text-right">
+                <h4 class="text-slate-600 font-bold">أهلاً بك، <span id="user-display-name" class="text-blue-600">...</span></h4>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border-b-4 border-emerald-500">
                     <p class="text-[10px] text-slate-400 font-bold uppercase mb-2">أرباح اليوم</p>
@@ -97,7 +101,12 @@
             if (user) {
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                loadData();
+                
+                // استخراج اسم المستخدم من الإيميل (مثلاً zainab@gmail.com يأخذ zainab)
+                const username = user.email.split('@')[0];
+                document.getElementById('user-display-name').innerText = username;
+                
+                loadData(username);
             } else {
                 document.getElementById('login-page').classList.remove('hidden');
                 document.getElementById('dashboard').classList.add('hidden');
@@ -112,17 +121,27 @@
 
         document.getElementById('logoutBtn').onclick = () => auth.signOut();
 
-        function loadData() {
-            // القراءة من مسار عام "promoter_data"
-            db.ref('promoter_data').on('value', (snapshot) => {
+        function loadData(username) {
+            // يقرأ البيانات من users_data/[اسم المستخدم]
+            db.ref('users_data/' + username).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     document.getElementById('total-earnings').innerText = '$' + (data.earnings || '0.00');
                     document.getElementById('today-earnings').innerText = '$' + (data.today_earnings || '0.00');
                     document.getElementById('clicks').innerText = data.clicks || '0';
+                } else {
+                    // إذا لم تكن هناك بيانات لهذا المستخدم بعد
+                    document.getElementById('total-earnings').innerText = '$0.00';
+                    document.getElementById('clicks').innerText = '0';
                 }
             });
         }
 
         function requestWithdraw() {
             const amount = document.getElementById('withdraw-amount').value;
+            if(!amount || amount <= 0) return alert("يرجى إدخال مبلغ صحيح");
+            alert("تم إرسال طلب السحب بنجاح، سيتم التواصل معكِ.");
+        }
+    </script>
+</body>
+</html>
